@@ -38,11 +38,11 @@ public class GameOverLayer extends CCLayer {
 
 	    String scoreString = "Du hast "+score+" Punkte erreicht.";
         if (isHighScore)
-            scoreString += "Das ist deine neue Bestmarke!";
+            scoreString += " Das ist deine neue Bestmarke!";
         
         CCLabel scoreView = CCLabel.makeLabel(scoreString, CGSize.make(300, 200), TextAlignment.LEFT, 
         		"Arial", 20.0f);
-        scoreView.setPosition(CGPoint.ccp(200,100));
+        scoreView.setPosition(CGPoint.ccp(230,80));
         addChild(scoreView);
 	    
 	    CCMenuItem repeat = CCMenuItemImage.item("btn_repeat@2x.png", "btn_repeat_over@2x.png", this, "repeatGame");
