@@ -16,6 +16,10 @@ import org.cocos2d.sound.SoundEngine;
 import org.cocos2d.types.CGPoint;
 import org.cocos2d.types.CGSize;
 
+import android.content.Context;
+import android.os.Looper;
+import android.widget.Toast;
+
 public class MenuLayer extends CCLayer{
 
 	private StartActivity parent =null;

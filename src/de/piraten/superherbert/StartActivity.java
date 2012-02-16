@@ -15,15 +15,25 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 /*
  * Dear person who is about to read this code: I'm deeply sorry. Part of this mess is a result of 
  * blindly translating plaetzchen's iOS original copypasta (https://github.com/plaetzchen/Super-Herbert )-- untangling
  * that one would've taken way too long. The other part is a result of despair and lack of documentation.
  * I will fix and clean this (hopefully). Until then, I strongly recommend you to close this file this instant.
+ */
+
+/*
+ *  TODO: 
+ *  popup mit steuerungshinweis bei highscore/bestheight = 0
+ *  accelerometervorzeichen je nach device -.- (Samsung i9000, Nexus, Nexus S, asus eee pad transformer, (HTC Desire Z, Android 2.3.3)
+ *  Steuerung zu empfindlich
+ *  Hintergrund größer für Galaxy Nexus
  */
 
 // OBACHT: org.cocos2d.types.ccVertex2F hat keinen getter/setter für die X / Y werte. Hab's jetzt manuell reingepopelt.
@@ -47,8 +57,8 @@ public class StartActivity extends Activity {
 
 
 	@Override
-	public void onCreate(Bundle savedInstanceState)
-	{
+	public void onCreate(Bundle savedInstanceState){
+
 	    super.onCreate(savedInstanceState);
 	 
 	    requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -91,7 +101,6 @@ public class StartActivity extends Activity {
 	    //Looper.prepare();
 	    
 	    CCDirector.sharedDirector().attachInView(_glSurfaceView);
-	    CCDirector.sharedDirector().setDisplayFPS(true);
 	    CCDirector.sharedDirector().setAnimationInterval(1.0f / 60.0f);
 	    
 	    // horrible hack to make opening a URL from the scene work. a bit. FIXME
@@ -231,4 +240,5 @@ public class StartActivity extends Activity {
 	protected Context getContext(){
 		return _cocos2dContext;
 	}
+	
 }

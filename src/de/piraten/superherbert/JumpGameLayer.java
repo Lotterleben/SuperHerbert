@@ -20,8 +20,9 @@ import org.cocos2d.types.ccVertex2F;
 import org.cocos2d.nodes.CCLabel;
 import org.cocos2d.nodes.CCLabel.TextAlignment;
 
-
 import android.hardware.SensorEvent;
+import android.os.Build;
+
 
 public class JumpGameLayer extends CCLayer{
 	
@@ -29,7 +30,6 @@ public class JumpGameLayer extends CCLayer{
 	final int kBonusStartTag = 300;
 
 	final int kPlatformNumber = 25;
-	// FYI: edited this.
 	final int kMinPlatformStep = 80;
 	final int kMaxPlatformStep = 320;
 	final int kPlatformTopPadding = 5;
@@ -63,6 +63,8 @@ public class JumpGameLayer extends CCLayer{
     CCSprite highScoreLabel;
     CCLabel scoreLabel;
     
+    int orientation = -1;
+    
     int score;
     int highScore;
     int height;
@@ -77,6 +79,12 @@ public class JumpGameLayer extends CCLayer{
 
 	public JumpGameLayer(StartActivity parent){
 		this.parent=parent;
+		System.out.println("buildVersion"+Build.VERSION.RELEASE);
+	    // since the Accelerometer orientation has changed with the API level 11, we'll
+	    // have to adjust it acccording to the device.
+		if (Build.VERSION.RELEASE.startsWith("3")){
+			orientation=1;
+		}
 		random= new Random();
 
 		CCSprite background= CCSprite.sprite("background-800x480.png");
@@ -144,10 +152,9 @@ public class JumpGameLayer extends CCLayer{
 		
 		bestHeight= parent.getScore("bestHeight");
 		highScore= parent.getScore("highScore");
-		
+        
 		// starts the actual game-loop.
 		this.schedule("step", 0.1f);
-		
 	}
 	
 /////// ANDROID STUFF ///////////////////////////////////////////
@@ -165,11 +172,11 @@ public class JumpGameLayer extends CCLayer{
 	
 	@Override
 	public void onSensorChanged(SensorEvent event) {
-		float accelFilter = 0.1f;
+		float accelFilter = 0.8f;
 		float accX = event.values[0];
 
 		//herbert_vel.setX(herbert_vel.getX() * accelFilter + accX * (1.0f - accelFilter) * 500.0f * -1);
-		herbert_vel.setX(herbert_vel.getX() * accelFilter + accX * (1.0f - accelFilter) * -100.0f);
+		herbert_vel.setX(herbert_vel.getX() * accelFilter + accX * (1.0f - accelFilter) * 100.0f * orientation);
 	}
 	
 /////// GAME METHODS ///////////////////////////////////////////
@@ -260,24 +267,15 @@ public class JumpGameLayer extends CCLayer{
 	}
 	
 	protected void resetHerbert(){
-	    CCSprite spriteHerbert = (CCSprite) getChildByTag(kHerbertTag);
 
 	    herbert_pos = new CGPoint();
-	    /*
-	    herbert_pos.x = 160;
-		herbert_pos.y = 160;
-		*/
+
 	    herbert_pos.set(160, 160); 
-		spriteHerbert.setPosition(herbert_pos);
-		
-	    /*herbert_vel.setX(0);
-		herbert_vel.setY(0);*/	
+		herbert.setPosition(herbert_pos);
+
 		herbert_vel = new ccVertex2F();
 		herbert_vel.setCGPoint(CGPoint.ccp(0,0));
 		
-		/*
-		herbert_acc.setX(0);
-		herbert_acc.setY(-550.0f);*/
 		herbert_acc = new ccVertex2F();
 		// FYI: edited this. herbert_acc.setCGPoint(CGPoint.ccp(0,-550.0f));
 		herbert_acc.setCGPoint(CGPoint.ccp(0,-300.0f));
@@ -305,17 +303,15 @@ public class JumpGameLayer extends CCLayer{
 	
 	public void step(float dt){
 		if(gameSuspended) return;
-	    
-		CCSprite spriteHerbert = (CCSprite) getChildByTag(kHerbertTag);
-		
+	    		
 		herbert_pos.set(herbert_pos.x += herbert_vel.getX() * dt, herbert_pos.y);
 		
 		if(herbert_vel.getX() < -30.0f && herbertLookingRight) {
 			herbertLookingRight = false;
-			spriteHerbert.setScaleX(-1.0f);
+			herbert.setScaleX(-1.0f);
 		} else if (herbert_vel.getX() > 30.0f && !herbertLookingRight) {
 			herbertLookingRight = true;
-			spriteHerbert.setScaleX(1.0f);
+			herbert.setScaleX(1.0f);
 		}
 	    
 		CGSize herbert_size = herbert.getContentSize();
@@ -331,7 +327,8 @@ public class JumpGameLayer extends CCLayer{
 		CCSprite bonus = (CCSprite) getChildByTag(kBonusStartTag+currentBonusType);
 		if(bonus.getVisible()) {
 			CGPoint bonus_pos = bonus.getPosition();
-			float range = 30.0f;
+			// FY: edited this. float range = 30.0f;
+			float range = 60.0f;
 			if(herbert_pos.x > bonus_pos.x - range &&
 			   herbert_pos.x < bonus_pos.x + range &&
 			   herbert_pos.y > bonus_pos.y - range &&
@@ -429,7 +426,7 @@ public class JumpGameLayer extends CCLayer{
 		}
 
 	    System.out.println("herbert_vel.y: "+herbert_vel.getY());
-		spriteHerbert.setPosition(herbert_pos);
+		herbert.setPosition(herbert_pos);
 	}
 
 	protected void playEffect(String sound){
