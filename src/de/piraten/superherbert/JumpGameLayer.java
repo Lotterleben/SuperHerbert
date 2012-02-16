@@ -23,11 +23,7 @@ import org.cocos2d.nodes.CCLabel.TextAlignment;
 
 import android.hardware.SensorEvent;
 
-// TODO: der CCTimer wirft immer mal wieder ne NPE o.0
-// ist 320 die breite des iphone-displays? auf unsere breite anpassen!
-
 public class JumpGameLayer extends CCLayer{
-	// "constants"
 	
 	final int kPlatformStartTag = 200;
 	final int kBonusStartTag = 300;
@@ -67,9 +63,6 @@ public class JumpGameLayer extends CCLayer{
     CCSprite highScoreLabel;
     CCLabel scoreLabel;
     
-    // TODO CCLabelTTF scoreLabel;
-    // UIAccelerometer accelerometer;
-    
     int score;
     int highScore;
     int height;
@@ -80,7 +73,6 @@ public class JumpGameLayer extends CCLayer{
 	StartActivity parent;
 	
 	Random random;
-
 	float displayWidth=480;
 
 	public JumpGameLayer(StartActivity parent){
@@ -110,50 +102,34 @@ public class JumpGameLayer extends CCLayer{
 		
 		herbert= CCSprite.sprite("dude_left-1-hd.png");
 		
-		// Versuch einer Animation, noch nicht fertig.
 		CCSpriteFrameCache sharedSpriteFrameCache= CCSpriteFrameCache.sharedSpriteFrameCache();
-		// da .plist und .png gleich aussehen, sollte das auch anstatt addSpriteFramesWithFile() gehen
+		
+		// Since .plist and .png have the same name cocs2d finds the .png automatically
 		sharedSpriteFrameCache.addSpriteFrames("dude-anim-hd_default.plist");
-		System.out.println("sharedSpriteFrameCache  "+sharedSpriteFrameCache.toString());
-        
-        // TODO whatthefuck to do with this. CCSpriteBatchNode spriteSheet = CCSpriteBatchNode batchNodeWithFile:@"dude-anim_default.png"];
-        //[self addChild:spriteSheet z:3 tag:kHerbertTag];
-        		
-        //NSMutableArray *flyAnimFrames = [NSMutableArray array];
+		
         ArrayList<CCSpriteFrame> flyAnimFrames = new ArrayList<CCSpriteFrame>();
-        
         
         for (int i = 1; i <= 4; i++) {
             flyAnimFrames.add(sharedSpriteFrameCache.spriteFrameByName("herbert"+i+".png"));
-            System.out.println("flyAnimFrames empty? "+flyAnimFrames.isEmpty());
         }
         CCAnimation flyAnim = CCAnimation.animation("flyAnim", 0.1f, flyAnimFrames);
-        System.out.println("flyAnim: "+flyAnim.name());
         herbertFlying = CCRepeatForever.action(CCAnimate.action(flyAnim, false));
         herbert.runAction(herbertFlying);
-        
-        //[spriteSheet addChild:self.herbert];
-        		
-		// FIXME anstatt der animationssahcen eingefŸŸgt. richtig so?
+                		
 		herbert.setTag(kHerbertTag);
 		addChild(herbert, 3);
-		
-		// ??? TODO self.herbertFlying = [CCRepeatForever actionWithAction:[CCAnimate actionWithAnimation:flyAnim restoreOriginalFrame:NO]];
 		
 		highScoreLabel = CCSprite.sprite("highscore.png");
 		highScoreLabel.setPosition(CGPoint.ccp(250,470));
 		highScoreLabel.setVisible(false);
-		//highScoreLabel.setTag(999);
 		addChild(highScoreLabel, 2);
 		
 		resetPlatforms();
 		resetHerbert();
 		resetBonus();
-				
-		// rate ist recht randomly gewŠhlt. FIXME
+		
+		// since CCLayer extends AccelerometerListener, we can do this. \o/
 		enableAccelerometerWithRate(1);
-
-		// TODO bestHeight
 		
 		effectsOn=parent.getSetting("effectsOn");
 		if (effectsOn){
@@ -169,6 +145,7 @@ public class JumpGameLayer extends CCLayer{
 		bestHeight= parent.getScore("bestHeight");
 		highScore= parent.getScore("highScore");
 		
+		// starts the actual game-loop.
 		this.schedule("step", 0.1f);
 		
 	}
@@ -190,14 +167,18 @@ public class JumpGameLayer extends CCLayer{
 	public void onSensorChanged(SensorEvent event) {
 		float accelFilter = 0.1f;
 		float accX = event.values[0];
-		System.out.println(accX);
 
-		herbert_vel.setX(herbert_vel.getX() * accelFilter + accX * (1.0f - accelFilter) * 500.0f);
+		//herbert_vel.setX(herbert_vel.getX() * accelFilter + accX * (1.0f - accelFilter) * 500.0f * -1);
+		herbert_vel.setX(herbert_vel.getX() * accelFilter + accX * (1.0f - accelFilter) * -100.0f);
 	}
 	
 /////// GAME METHODS ///////////////////////////////////////////
 
+	/*
+	 * Creates the first 25 platforms that we'll scroll through.
+	 */
 	protected void initPlatforms(){
+		
 		currentPlatformTag = kPlatformStartTag;
 		while(currentPlatformTag < kPlatformStartTag + kPlatformNumber){
 			initPlatform();
@@ -205,7 +186,11 @@ public class JumpGameLayer extends CCLayer{
 		}
 	}
 	
+	/*
+	 * Creates randomly sized Platform (s, m or l)
+	 */
 	protected void initPlatform(){
+		
 		CCSprite platform;
 		switch(random.nextInt(3)){
 		case 1:
@@ -223,6 +208,7 @@ public class JumpGameLayer extends CCLayer{
 		}
 		addChild(platform, 1);	
 	}
+	
 	
 	protected void resetPlatforms(){
 		
@@ -251,9 +237,7 @@ public class JumpGameLayer extends CCLayer{
 		}
 		
 		CCSprite platform = (CCSprite) getChildByTag(currentPlatformTag);
-		
-		// TODO: x so anpassen dass die wšlkchen auhc nach rechts kommen ;)
-		
+				
 		//if(random.nextInt(2)==1)
 			//platform.setScaleX(-1.0f);
 		
@@ -262,7 +246,6 @@ public class JumpGameLayer extends CCLayer{
 		if(currentPlatformY == 30.0f) {
 			x = 160.0f;
 		} else {
-			//x = random.nextInt(displayWidth-(int)size.width) + size.width/2;
 			x = random.nextInt((int)(displayWidth-size.width)) + size.width/2;
 		}
 		
@@ -285,7 +268,6 @@ public class JumpGameLayer extends CCLayer{
 		herbert_pos.y = 160;
 		*/
 	    herbert_pos.set(160, 160); 
-	    System.out.println(herbert_pos);
 		spriteHerbert.setPosition(herbert_pos);
 		
 	    /*herbert_vel.setX(0);
@@ -297,16 +279,14 @@ public class JumpGameLayer extends CCLayer{
 		herbert_acc.setX(0);
 		herbert_acc.setY(-550.0f);*/
 		herbert_acc = new ccVertex2F();
-		herbert_acc.setCGPoint(CGPoint.ccp(0,-550.0f));
+		// FYI: edited this. herbert_acc.setCGPoint(CGPoint.ccp(0,-550.0f));
+		herbert_acc.setCGPoint(CGPoint.ccp(0,-300.0f));
 	    
 		herbert.setScaleX(1.0f);
 	}
 	
 	protected void resetBonus(){
-		System.out.println("kBonusStartTag: "+ kBonusStartTag);
-		System.out.println("currentBonusType: "+currentBonusType);
 		CCSprite bonus = (CCSprite) getChildByTag(kBonusStartTag+currentBonusType);
-		System.out.println("bonus: "+bonus);
 	    
 		bonus.setVisible(false);
 		currentBonusPlatformIndex += random.nextInt(kMaxBonusStep - kMinBonusStep) + kMinBonusStep;
@@ -324,23 +304,14 @@ public class JumpGameLayer extends CCLayer{
 	}
 	
 	public void step(float dt){
-		// TODO
-		
-		
-		System.out.println("step");
-		System.out.println("highscore: "+highScore);
-		//jump();
-		
 		if(gameSuspended) return;
 	    
 		CCSprite spriteHerbert = (CCSprite) getChildByTag(kHerbertTag);
 		
-		//herbert_pos.x += herbert_vel.x * dt;
 		herbert_pos.set(herbert_pos.x += herbert_vel.getX() * dt, herbert_pos.y);
 		
 		if(herbert_vel.getX() < -30.0f && herbertLookingRight) {
 			herbertLookingRight = false;
-			// FYI: inus rausgenommen.
 			spriteHerbert.setScaleX(-1.0f);
 		} else if (herbert_vel.getX() > 30.0f && !herbertLookingRight) {
 			herbertLookingRight = true;
@@ -354,9 +325,7 @@ public class JumpGameLayer extends CCLayer{
 		if(herbert_pos.x>max_x) herbert_pos.setX(max_x);
 		if(herbert_pos.x<min_x) herbert_pos.setX(min_x);
 	
-		//herbert_vel.y += herbert_acc.y * dt;
 		herbert_vel.setY(herbert_vel.getY() + herbert_acc.getY() * dt);
-		//herbert_pos.y += herbert_vel.y * dt;
 		herbert_pos.set(herbert_pos.x, herbert_pos.y + herbert_vel.getY() * dt);
 		
 		CCSprite bonus = (CCSprite) getChildByTag(kBonusStartTag+currentBonusType);
@@ -390,19 +359,23 @@ public class JumpGameLayer extends CCLayer{
 				CGSize platform_size = platform.getContentSize();
 				CGPoint platform_pos = platform.getPosition();
 				
+				// evtl max & min eingrenzen fŸr mehr jump-accuracy? TODO
 				max_x = platform_pos.x - platform_size.width/2;
 				min_x = platform_pos.x + platform_size.width/2;
 				float min_y = platform_pos.y + (platform_size.height+herbert_size.height)/2 - kPlatformTopPadding;
 				
+				
 				if(herbert_pos.x > max_x &&
 				   herbert_pos.x < min_x &&
 				   herbert_pos.y > platform_pos.y &&
-				   herbert_pos.y < min_y) {
+				   herbert_pos.y < min_y&&
+				   herbert_pos.y != platform_pos.y &&
+				   herbert_pos.x != platform_pos.y) {
+					System.out.println("jump");
 					jump();
 				}
 			}
 			
-			// TODO evtl failed diese abbruchbedingung?
 			if(herbert_pos.y < -herbert_size.height/2) {
 				gameOver();
 			}
@@ -412,10 +385,7 @@ public class JumpGameLayer extends CCLayer{
 			herbert_pos.setY(240);
 	        
 			currentPlatformY -= delta;
-	        
-	        //CCSprite highScoreLabel = (CCSprite ) getChildByTag(999);
-	        System.out.println("highscorelabel: "+highScoreLabel);
-	        
+	        	        
 	        if (height > bestHeight){
 	            highScoreLabel.setVisible(true);
 	            highScoreLabel.setPosition(CGPoint.ccp(highScoreLabel.getPosition().x,highScoreLabel.getPosition().y-delta));
@@ -438,7 +408,6 @@ public class JumpGameLayer extends CCLayer{
 			 
 			if(bonus.getVisible()) {
 				CGPoint pos = bonus.getPosition();
-				// TODO: recht so? pos.y -= delta;
 
 				pos.set(pos.x, pos.y-delta );
 				if(pos.y < -bonus.getContentSize().height/2) {
@@ -456,9 +425,10 @@ public class JumpGameLayer extends CCLayer{
 		}
 
 	    if (height == bestHeight){
-	    	System.out.println("highscore!");
 	        highScoreLabel.setVisible(true);
 		}
+
+	    System.out.println("herbert_vel.y: "+herbert_vel.getY());
 		spriteHerbert.setPosition(herbert_pos);
 	}
 
@@ -475,18 +445,16 @@ public class JumpGameLayer extends CCLayer{
 	
 	protected void jump(){
 	    playEffect("whoosh");
-	    System.out.println("jump, my pretty ballerina");
-		herbert_vel.setY(350.0f + Math.abs(herbert_vel.getX()));
+		//FYI: edited this. herbert_vel.setY(350.0f + Math.abs(herbert_vel.getX()));
+	    herbert_vel.setY(400.0f + Math.abs(herbert_vel.getX()));
 	}
 	protected void gameOver(){
 		playEffect("gameover");
-		System.out.println("highscore: "+highScore);
 		SoundEngine.sharedEngine().pauseSound();
 		// why do I have to call parent here? o0 FIXME
 		parent.unregisterSensorListener();
 		
 		boolean isHighScore=false;
-		// umm...     [[NSUserDefaults standardUserDefaults]setInteger:score forKey:@"newHighScore"];
 		if (score > highScore){
 			parent.storeSetting("highScore", score);
 			isHighScore=true;
@@ -494,7 +462,6 @@ public class JumpGameLayer extends CCLayer{
 		if (height > bestHeight)
 			parent.storeSetting("bestHeight", height);
 		
-		// TODO: highscoreLayer
 		CCDirector.sharedDirector().replaceScene(GameOverLayer.scene(parent, score,isHighScore ));
 	}
 	

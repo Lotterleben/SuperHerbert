@@ -16,10 +16,7 @@ import org.cocos2d.sound.SoundEngine;
 import org.cocos2d.types.CGPoint;
 import org.cocos2d.types.CGSize;
 
-// hei§t im tutorial GameLayer
-
-// TODO: MoveClouds
-public class MenuLayer extends CCLayer /*implements Serializable*/{
+public class MenuLayer extends CCLayer{
 
 	private StartActivity parent =null;
 	private ArrayList<CCSprite> clouds;
@@ -31,7 +28,6 @@ public class MenuLayer extends CCLayer /*implements Serializable*/{
 		
 		this.parent=parent;
 		
-		// FIXME der handler hiervon scheint Probleme zu bereiten.
 	    CGSize winSize = CCDirector.sharedDirector().displaySize();
 	    CCSprite background = CCSprite.sprite("background-menu-800x480.png");
 	 

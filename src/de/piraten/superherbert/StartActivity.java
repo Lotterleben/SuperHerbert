@@ -26,10 +26,8 @@ import android.view.WindowManager;
  * I will fix and clean this (hopefully). Until then, I strongly recommend you to close this file this instant.
  */
 
-// Probleme: 
-// 1. das springen sieht kacke aus.
-
 // OBACHT: org.cocos2d.types.ccVertex2F hat keinen getter/setter für die X / Y werte. Hab's jetzt manuell reingepopelt.
+
 
 public class StartActivity extends Activity {
 	/**

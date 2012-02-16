@@ -13,7 +13,6 @@ import org.cocos2d.types.CGSize;
 
 public class SettingsLayer extends CCLayer {
 	StartActivity parent=null;
-    // TODO: Bildchen je nach status on/off anzeigen
     CCMenuItem music=null;
     CCMenuItem effects=null;
     CCMenuItemToggle musicSwitch=null;
@@ -49,21 +48,12 @@ public class SettingsLayer extends CCLayer {
 	    updateSwitches();
 		
 	}
-	
-/*	private void updateSwitches() {
-		// TODO Auto-generated method stub
-		boolean musicStatus= parent.getSetting("musicOn");
-		//System.out.println(musicSwitch.selectedIndex());
-		// zum testen, wenns klappt TODO getSetting umschreiben
-		System.out.println("musicStatus: "+musicStatus);
-	}*/
 
 	public void toggleMusic(Object sender){
 		parent.bgMusicClicked();		
 	}
 	
 	public void toggleEffects(Object sender){
-		// Turn effects on/off FIXME
 		parent.effectsClicked();
 
 	}
